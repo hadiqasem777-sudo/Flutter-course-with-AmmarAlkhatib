@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'AppBrain.dart';
 
 AppBrain appBrain = AppBrain();
 void main() {
   runApp(const ExamApp());
-}
-
-class QuestionAndAnsware {
-  String img;
-  String quistion;
-  bool answer;
-
-  QuestionAndAnsware(this.img, this.quistion, this.answer);
 }
 
 class ExamApp extends StatelessWidget {
@@ -44,10 +37,9 @@ class ExamPage extends StatefulWidget {
 
 class _ExamPageState extends State<ExamPage> {
   List<Padding> amswarResult = [];
-  bool examFinished = false;
 
   void chickAnswer(bool userAnswer) {
-    if (examFinished) {
+    if (appBrain.getExamFinished()) {
       return;
     }
 
@@ -63,6 +55,7 @@ class _ExamPageState extends State<ExamPage> {
             ),
           ),
         );
+        appBrain.incrementCurrectAnswers();
       } else {
         amswarResult.add(
           Padding(
@@ -75,11 +68,38 @@ class _ExamPageState extends State<ExamPage> {
           ),
         );
       }
+      appBrain.checkNumOfQuestions();
+      if (appBrain.getExamFinished() == true) {
+        // إظهار التنبيه فوراً
+        Alert(
+          context: context,
 
-      if (appBrain.getNumOfQuestions() < appBrain.getQuestionCount() - 1) {
-        appBrain.nextQuestion();
-      } else {
-        examFinished = true;
+        style: const AlertStyle(
+            isOverlayTapDismiss: false, // تمنع الإغلاق عند الضغط خارج النافذة
+            isCloseButton: true, // لإظهار علامة الـ X في الزاوية (وهي true بشكل افتراضي)
+          ),
+
+          title: "انتهاء الاختبار",
+          // استخدام المتغيرات الديناميكية لجلب النتيجة وعدد الأسئلة الكلي
+          desc:
+              "لقد أجبت على ${appBrain.getNumOfCurrectAnswers()} أسئلة صحيحة من أصل ${appBrain.getQuestionCount()}",
+          buttons: [
+            DialogButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  appBrain.restartExam();
+                  amswarResult.clear();
+                });
+              },
+              width: 120,
+              child: const Text(
+                "ابدأ من جديد",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
+          ],
+        ).show();
       }
     });
   }
@@ -108,15 +128,14 @@ class _ExamPageState extends State<ExamPage> {
         ),
         Row(children: amswarResult),
         SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
           children: [
             TextButton(
               onPressed: () {
                 setState(() {
                   appBrain.restartExam();
                   amswarResult.clear();
-                  examFinished = false;
                 });
               },
               style: TextButton.styleFrom(
@@ -143,9 +162,7 @@ class _ExamPageState extends State<ExamPage> {
             child: TextButton(
               onPressed: () {
                 setState(() {
-                  if (examFinished == false) {
-                    chickAnswer(true);
-                  }
+                  chickAnswer(true);
                 });
               },
               style: TextButton.styleFrom(
@@ -171,9 +188,7 @@ class _ExamPageState extends State<ExamPage> {
             child: TextButton(
               onPressed: () {
                 setState(() {
-                  if (examFinished == false) {
-                    chickAnswer(false);
-                  }
+                  chickAnswer(false);
                 });
               },
               style: TextButton.styleFrom(

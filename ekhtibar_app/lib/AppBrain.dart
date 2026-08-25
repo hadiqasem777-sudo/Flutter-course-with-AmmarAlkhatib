@@ -27,9 +27,23 @@ class AppBrain {
     ),
     QuestionAndAnsware('images/image-7.jpg', 'الحيوانات لا تشعر بالألم', false),
   ];
+  bool _examFinished = false;
+  int _numOfCurrectAnswers = 0;
+
+
+
+  void incrementCurrectAnswers() {
+    _numOfCurrectAnswers++;
+  }
+
+  int getNumOfCurrectAnswers() {
+    return _numOfCurrectAnswers;
+  }
 
   void restartExam() {
     _numOfQuestions = 0;
+    _numOfCurrectAnswers = 0;
+    _examFinished = false;
   }
 
   void nextQuestion() {
@@ -40,7 +54,7 @@ class AppBrain {
 
   int getNumOfQuestions() {
     return _numOfQuestions;
-  } 
+  }
 
   int getQuestionCount() {
     return _questions.length;
@@ -56,5 +70,21 @@ class AppBrain {
 
   bool getAnswer() {
     return _questions[_numOfQuestions].answer;
+  }
+
+  void checkNumOfQuestions() {
+    if (getNumOfQuestions() < getQuestionCount() - 1) {
+      nextQuestion();
+    } else {
+      _examFinished = true;
+    }
+  }
+
+  void setExamFinished(bool state) {
+    _examFinished = state;
+  }
+
+  bool getExamFinished() {
+    return _examFinished;
   }
 }
