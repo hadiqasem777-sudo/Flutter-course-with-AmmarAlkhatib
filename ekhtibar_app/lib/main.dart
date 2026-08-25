@@ -70,17 +70,14 @@ class _ExamPageState extends State<ExamPage> {
       }
       appBrain.checkNumOfQuestions();
       if (appBrain.getExamFinished() == true) {
-        // إظهار التنبيه فوراً
         Alert(
           context: context,
 
         style: const AlertStyle(
             isOverlayTapDismiss: false, // تمنع الإغلاق عند الضغط خارج النافذة
-            isCloseButton: true, // لإظهار علامة الـ X في الزاوية (وهي true بشكل افتراضي)
           ),
 
           title: "انتهاء الاختبار",
-          // استخدام المتغيرات الديناميكية لجلب النتيجة وعدد الأسئلة الكلي
           desc:
               "لقد أجبت على ${appBrain.getNumOfCurrectAnswers()} أسئلة صحيحة من أصل ${appBrain.getQuestionCount()}",
           buttons: [
